@@ -50,7 +50,7 @@ public class LinearTest extends LinearOpMode {
         timer.reset();
 
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + timer.toString());
+            telemetry.addData("Status", "RunTime: " + timer.toString());
             telemetry.update();
         }
     }
