@@ -112,7 +112,9 @@ public class Drive2021 extends LinearOpMode {
     }
 
     /**
-     * Describe this function...
+     * Turn the robot around using the right game pad joystick:
+     * Push to the right to turn clockwise
+     * Push to the left to turn counterclockwise
      */
     private void rotate() {
         // if the gamepad right stick is moved:
@@ -136,6 +138,7 @@ public class Drive2021 extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
+        System.out.println("hi");
         BNO055IMU.Parameters IMU_Parameters;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         wheel1 = hardwareMap.get(DcMotor.class, "wheel1");
