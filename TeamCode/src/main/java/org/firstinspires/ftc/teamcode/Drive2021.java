@@ -25,9 +25,9 @@ public class Drive2021 extends LinearOpMode {
     private Servo thumbServo;
     private DcMotor motorArm;
     float gyro;
-    double speed;
+    final double speed = 0.8;
     double stickAngle;
-    double rotateSpeed;
+    final double rotateSpeed = 0.6;
     /**
      * Drive & rotate
      */
@@ -36,9 +36,7 @@ public class Drive2021 extends LinearOpMode {
         // sets bot to angle from starting position
         gyro = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
         // idea: ability to change speed during play?
-        // sets speeds of robot
-        speed = 0.8;
-        rotateSpeed = 0.6;
+
         // Wheel power to zero
         wheel1.setPower(0);
         wheel3.setPower(0);
@@ -78,9 +76,10 @@ public class Drive2021 extends LinearOpMode {
             RightShooter.setPower(0);
         }
         telemetry.addData("flick", Flick.getPosition());
-        if (gamepad1.x) {
-            Flick.setPosition(5);
-        }
+
+//        if (gamepad1.x) {
+//            Flick.setPosition(5);
+//        }
     }
 
 
@@ -138,7 +137,7 @@ public class Drive2021 extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
-        System.out.println("hi");
+
         BNO055IMU.Parameters IMU_Parameters;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         wheel1 = hardwareMap.get(DcMotor.class, "wheel1");
@@ -150,7 +149,7 @@ public class Drive2021 extends LinearOpMode {
         RightShooter = hardwareMap.get(DcMotor.class, "RightShooter");
         Flick = hardwareMap.get(Servo.class, "Flick");
         BaseArm = hardwareMap.get(DcMotor.class, "BaseArm");
-        motorTopArm = hardwareMap.get(DcMotor.class, "motorTopArm");
+        //motorTopArm = hardwareMap.get(DcMotor.class, "motorTopArm");
         thumbServo = hardwareMap.get(Servo.class, "thumbServo");
         motorArm = hardwareMap.get(DcMotor.class, "motorArm");
         // Put initialization blocks here.
