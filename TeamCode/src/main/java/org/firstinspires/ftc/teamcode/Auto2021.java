@@ -54,7 +54,7 @@ public class Auto2021 extends LinearOpMode {
             //Put wobble goal in square A
             george.drive(0,1, 5);
             george.drive(1,0, 5);
-            //Move forwards at a 100 deg angle
+            //Move forwards at angle
 
             //back up a little bit an angle
 

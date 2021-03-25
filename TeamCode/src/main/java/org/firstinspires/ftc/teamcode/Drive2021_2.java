@@ -32,11 +32,14 @@ public class Drive2021_2 extends LinearOpMode {
                 telemetry.addData("Gyro", george.gyro);
                 telemetry.addData("Joystick x", gamepad1.left_stick_x);
                 telemetry.addData("Joystick y", gamepad1.left_stick_y);
+                telemetry.addData("Flick position", george.Flick.getPosition());
                 telemetry.update();
                 george.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y);
                 george.rotate(gamepad1.right_stick_x);
-                //george.shoot(gamepad1.a, gamepad1.b);
-                //george.intake(gamepad1.right_bumper);
+                george.shoot(gamepad1.a, gamepad1.b, gamepad1.x);
+                george.intake(gamepad1.right_bumper);
+                //george.arm(gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.left_bumper);
+                //line above is the code to test 'arm' method
                 telemetry.update();
             }
         }

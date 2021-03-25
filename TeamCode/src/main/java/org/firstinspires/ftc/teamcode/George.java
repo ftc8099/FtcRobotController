@@ -54,15 +54,15 @@ public class George
     private DcMotor Ramp;
     private DcMotor LeftShooter;
     private DcMotor RightShooter;
-    private Servo Flick;
+    public Servo Flick;
     private DcMotor BaseArm;
-    private DcMotor motorTopArm;
-    private Servo thumbServo;
-    private DcMotor motorArm;
+    private Servo arm;
     float gyro;
     double speed = 1;
     double stickAngle;
     double rotateSpeed = 0.5;
+    double FlickPosition;
+    double armPosition = 0;
 
     /* local OpMode members. */
     HardwareMap hwMap;
@@ -80,20 +80,21 @@ public class George
         wheel3 = hardwareMap.get(DcMotor.class, "wheel3");
         wheel2 = hardwareMap.get(DcMotor.class, "wheel2");
         wheel4 = hardwareMap.get(DcMotor.class, "wheel4");
-//        Ramp = hardwareMap.get(DcMotor.class, "Ramp");
-//        LeftShooter = hardwareMap.get(DcMotor.class, "LeftShooter");
-//        RightShooter = hardwareMap.get(DcMotor.class, "RightShooter");
-//        Flick = hardwareMap.get(Servo.class, "Flick");
-//        BaseArm = hardwareMap.get(DcMotor.class, "BaseArm");
-//        motorTopArm = hardwareMap.get(DcMotor.class, "motorTopArm");
-//        thumbServo = hardwareMap.get(Servo.class, "thumbServo");
-//        motorArm = hardwareMap.get(DcMotor.class, "motorArm");
+        Ramp = hardwareMap.get(DcMotor.class, "Ramp");
+        LeftShooter = hardwareMap.get(DcMotor.class, "LeftShooter");
+        RightShooter = hardwareMap.get(DcMotor.class, "RightShooter");
+        Flick = hardwareMap.get(Servo.class, "Flick");
+        BaseArm = hardwareMap.get(DcMotor.class, "BaseArm");
+        arm = hardwareMap.get(Servo.class, "arm");
         // Put initialization blocks here.
         //Flick.setDirection(Servo.Direction.REVERSE);
         wheel2.setDirection(DcMotorSimple.Direction.REVERSE);
         wheel3.setDirection(DcMotorSimple.Direction.REVERSE);
         wheel1.setDirection(DcMotorSimple.Direction.FORWARD);
         wheel4.setDirection(DcMotorSimple.Direction.FORWARD);
+        RightShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        LeftShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        FlickPosition = Flick.getPosition();
         IMU_Parameters = new BNO055IMU.Parameters();
         IMU_Parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(IMU_Parameters);
@@ -117,8 +118,8 @@ public class George
             // calculate angle of the stick from x & y values
             stickAngle = Math.atan2(y, x) / Math.PI * 180;
             // remove the gyro angle & translate to x & y
-            eqX = Math.cos((stickAngle - gyro) / 180 * Math.PI);
-            eqY = Math.sin((stickAngle - gyro) / 180 * Math.PI);
+            eqX = Math.cos((stickAngle + gyro) / 180 * Math.PI);
+            eqY = Math.sin((stickAngle + gyro) / 180 * Math.PI);
             // Set powers of wheels to move in intended direction
             wheel1.setPower((eqY + eqX) * speed);
             wheel3.setPower((eqY + eqX) * speed);
@@ -161,14 +162,15 @@ public class George
         }
     }
 
-    public void intake(boolean right_bumper) {
+    public void intake(boolean ramp) {
         Ramp.setPower(0);
-        if (right_bumper) {
+        if (ramp) {
             Ramp.setPower(1);
         }
     }
 
-    public void shoot(boolean a, boolean b) {
+    public void shoot(boolean a, boolean b, boolean x) {
+
         if (a) {
             LeftShooter.setPower(1);
             RightShooter.setPower(1);
@@ -178,9 +180,25 @@ public class George
             RightShooter.setPower(0);
         }
 
-//        if (gamepad1.x) {
-//            Flick.setPosition(5);
-//        }
+        if (x) {
+            FlickPosition = Math.abs(FlickPosition - 1);
+            Flick.setPosition(FlickPosition); //we are only having troubles with this servo, so it may be specific to it
+        }
+    }
+
+    public void arm (boolean baseUp, boolean baseDown, boolean gripper){
+        BaseArm.setPower(0);
+        //  may need to reverse the BaseArm direction in the George constructor
+        if (baseUp){
+            BaseArm.setPower(0.5);
+        }
+        if (baseDown){
+            BaseArm.setPower(-0.5);
+        }
+        if (gripper){
+            armPosition = Math.abs(armPosition - 1); //sets the armPosition to 1 or 0, whichever it is not
+            arm.setPosition(armPosition);
+        }
     }
  }
 
