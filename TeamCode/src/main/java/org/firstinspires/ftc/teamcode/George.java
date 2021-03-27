@@ -133,7 +133,7 @@ public class George
         wheel4.setPower(0);
     }
 
-    public void drive(double x, double y, int time) {
+    public void drive(double x, double y, double time) {
          ElapsedTime timer  = new ElapsedTime();
          timer.reset();
          while(timer.time(TimeUnit.SECONDS) < time) {
@@ -188,13 +188,22 @@ public class George
         }
     }
 
-    public void shoot (int time){
+    public void shoot (double time, int rings){
         //activates flick servo and shooters for specified time
         ElapsedTime timer = new ElapsedTime();
+        ElapsedTime ring = new ElapsedTime();
         timer.reset();
         while (timer.time(TimeUnit.SECONDS) < time){
-            shoot(true, false, true);
+            shoot(true, false, false);
+            if (timer.time(TimeUnit.SECONDS) % 3 == 0){
+                Flick.setPosition(1);
+                ring.reset();
+                if (ring.time(TimeUnit.SECONDS) > 1) {
+                    Flick.setPosition(0);
+                }
+            }
         }
+
     }
 
     public void arm (boolean baseUp, boolean baseDown, boolean gripper){
