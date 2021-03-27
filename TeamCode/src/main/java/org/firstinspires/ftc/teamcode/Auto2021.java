@@ -51,19 +51,20 @@ public class Auto2021 extends LinearOpMode {
         george = new George(hardwareMap);
         waitForStart();
         if (opModeIsActive()) {
-            //Put wobble goal in square A
-            george.drive(0,1, 5);
-            george.drive(1,0, 5);
+            //ToDo: edit the numbers based on testing
+            //Put wobble goal in square A:
             //Move forwards at angle
-
+            george.drive(-1,2, 2);
+            george.arm(50); //hopefully this works --> lower arm and open gripper
+            george.gripper(true);
             //back up a little bit an angle
-
+            george.drive(1, -2,1);
             // move forwards up to tower
-
+            george.drive(0,1,2);
             //activate flick servo, and shooter motors
-
+            george.shoot(5);
             // move backwards to launch line
-
+            george.drive(0, -1, 1);
             telemetry.update();
         }
 

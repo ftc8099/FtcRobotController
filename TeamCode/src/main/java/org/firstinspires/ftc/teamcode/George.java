@@ -182,7 +182,18 @@ public class George
 
         if (x) {
             FlickPosition = Math.abs(FlickPosition - 1);
-            Flick.setPosition(FlickPosition); //we are only having troubles with this servo, so it may be specific to it
+            Flick.setPosition(FlickPosition);
+            //do we want to have the flick servo just keep moving when activated
+            //or just move when clicked
+        }
+    }
+
+    public void shoot (int time){
+        //activates flick servo and shooters for specified time
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (timer.time(TimeUnit.SECONDS) < time){
+            shoot(true, false, true);
         }
     }
 
@@ -200,5 +211,25 @@ public class George
             arm.setPosition(armPosition);
         }
     }
+
+    public void arm (int position){
+        BaseArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BaseArm.setTargetPosition(position);
+        BaseArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BaseArm.setPower(0.5);
+        //possible error: will below line stop arm movement prematurely?
+        BaseArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public void gripper(boolean open){
+        if (open) {
+            arm.setPosition(1);
+        }else{
+            arm.setPosition(0);
+        }
+
+    }
+
+
+
  }
 
