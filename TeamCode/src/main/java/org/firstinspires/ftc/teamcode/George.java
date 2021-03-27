@@ -190,10 +190,10 @@ public class George
         BaseArm.setPower(0);
         //  may need to reverse the BaseArm direction in the George constructor
         if (baseUp){
-            BaseArm.setPower(0.5);
+            BaseArm.setPower(0.50);
         }
         if (baseDown){
-            BaseArm.setPower(-0.5);
+            BaseArm.setPower(-0.50);
         }
         if (gripper){
             armPosition = Math.abs(armPosition - 1); //sets the armPosition to 1 or 0, whichever it is not
