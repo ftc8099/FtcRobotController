@@ -54,13 +54,17 @@ public class Auto2021 extends LinearOpMode {
             //ToDo: edit the numbers based on testing
             //Put wobble goal in square A:
             //Move forwards at angle
-            george.drive(0,1, 2.75);
+            george.speed = 0.75;
+            george.drive(0,1, 3.66);
 //            george.arm(50); //hopefully this works --> lower arm and open gripper
 //            george.gripper(true);
             //back up a little bit an angle
-            george.drive(1, 0,0.5);
+            george.drive(1, 0,1.5);
+            george.drive(0,1,0.06);
             //activate flick servo, and shooter motors
-            george.shoot(10, 1);
+            george.shoot(5);
+            george.intake(10);
+            george.shoot(5);
             telemetry.update();
         }
 

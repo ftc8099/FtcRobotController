@@ -98,10 +98,15 @@ public class George
         IMU_Parameters = new BNO055IMU.Parameters();
         IMU_Parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(IMU_Parameters);
+        Flick.setPosition(1);
     }
 
     public boolean wheelCheck(){
         return (wheel1 != null && wheel2 != null && wheel3 != null && wheel4 != null);
+    }
+
+    public double getAngle(){
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
     }
 
     public void drive(double x, double y) {
@@ -110,7 +115,8 @@ public class George
         gyro = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
         // idea: ability to change speed during play?
 
-
+        x = -x;
+        //y = -y;
         double eqX;
         double eqY;
         // if the gamepad left stick is moved:
@@ -168,7 +174,14 @@ public class George
             Ramp.setPower(1);
         }
     }
-
+    public void intake(double time){
+        ElapsedTime rampTime = new ElapsedTime();
+        rampTime.reset();
+        if(rampTime.time(TimeUnit.SECONDS) < time){
+            intake(true);
+        }
+        intake(false);
+    }
     public void shoot(boolean a, boolean b, boolean x) {
 
         if (a) {
@@ -181,28 +194,27 @@ public class George
         }
 
         if (x) {
-            FlickPosition = Math.abs(FlickPosition - 1);
-            Flick.setPosition(FlickPosition);
-            //do we want to have the flick servo just keep moving when activated
-            //or just move when clicked
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            Flick.setPosition(0);
+            if (timer.time(TimeUnit.SECONDS) > 1){
+                Flick.setPosition(1);
+            }
         }
     }
 
-    public void shoot (double time, int rings){
+    public void shoot (double time){
         //activates flick servo and shooters for specified time
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime ring = new ElapsedTime();
         timer.reset();
         while (timer.time(TimeUnit.SECONDS) < time){
             shoot(true, false, false);
-            if (timer.time(TimeUnit.SECONDS) % 3 == 0){
-                Flick.setPosition(1);
-                ring.reset();
-                if (ring.time(TimeUnit.SECONDS) > 1) {
-                    Flick.setPosition(0);
-                }
+            if (timer.time(TimeUnit.SECONDS) > 1.5){
+                shoot(true, false, true);
             }
         }
+        shoot(false, true, false);
 
     }
 
