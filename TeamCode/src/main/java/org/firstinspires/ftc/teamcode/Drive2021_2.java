@@ -39,7 +39,11 @@ public class Drive2021_2 extends LinearOpMode {
                 george.shoot(gamepad1.a, gamepad1.b, gamepad1.x);
                 george.intake(gamepad1.right_bumper);
                 george.arm(gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.dpad_left);
-//                line above is the code to test 'arm' method
+//                line below: press left bumper to activate shooters and then flick
+                //uncomment to test
+//                if (gamepad1.left_bumper){
+//                    george.shoot(3);
+//                }
                 telemetry.update();
             }
         }

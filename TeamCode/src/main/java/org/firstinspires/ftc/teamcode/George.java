@@ -206,11 +206,10 @@ public class George
     public void shoot (double time){
         //activates flick servo and shooters for specified time
         ElapsedTime timer = new ElapsedTime();
-        ElapsedTime ring = new ElapsedTime();
         timer.reset();
         while (timer.time(TimeUnit.SECONDS) < time){
             shoot(true, false, false);
-            if (timer.time(TimeUnit.SECONDS) > 1.5){
+            if (timer.time(TimeUnit.SECONDS) > 1){
                 shoot(true, false, true);
             }
         }
