@@ -59,12 +59,14 @@ public class Auto2021 extends LinearOpMode {
 //            george.arm(50); //hopefully this works --> lower arm and open gripper
 //            george.gripper(true);
             //back up a little bit an angle
-            george.drive(1, 0,1.5);
-            george.drive(0,1,0.06);
+            george.drive(1, 0,1.2);
+            george.drive(0,1,0.03);
+            george.drive(0,-1, 1);
             //activate flick servo, and shooter motors
             george.shoot(5);
             george.intake(10);
             george.shoot(5);
+            george.drive(0,1,1);
             telemetry.update();
         }
 

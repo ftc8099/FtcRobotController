@@ -202,11 +202,21 @@ public class George
             }
         }
     }
+    public void flick(boolean a){
+        if (a) {
+            ElapsedTime wait = new ElapsedTime();
+            while(wait.time(TimeUnit.SECONDS) < 1.5) {
+                Flick.setPosition(0);
+            }
+            Flick.setPosition(1);
+        }
+    }
 
     public void shoot (double time){
         //activates flick servo and shooters for specified time
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
+        Flick.setPosition(1);
         while (timer.time(TimeUnit.SECONDS) < time){
             shoot(true, false, false);
             if (timer.time(TimeUnit.SECONDS) > 1){

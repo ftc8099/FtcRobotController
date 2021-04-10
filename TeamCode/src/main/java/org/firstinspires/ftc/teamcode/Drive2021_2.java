@@ -36,7 +36,8 @@ public class Drive2021_2 extends LinearOpMode {
                 telemetry.update();
                 george.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y);
                 george.rotate(gamepad1.right_stick_x);
-                george.shoot(gamepad1.a, gamepad1.b, gamepad1.x);
+                george.flick(gamepad1.x);
+                george.shoot(gamepad1.a, gamepad1.b, false);
                 george.intake(gamepad1.right_bumper);
                 george.arm(gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.dpad_left);
 //                line below: press left bumper to activate shooters and then flick
@@ -44,6 +45,7 @@ public class Drive2021_2 extends LinearOpMode {
 //                if (gamepad1.left_bumper){
 //                    george.shoot(3);
 //                }
+
                 telemetry.update();
             }
         }
