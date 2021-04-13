@@ -101,6 +101,13 @@ public class George
         Flick.setPosition(1);
     }
 
+    public void initGyro (HardwareMap hwMap){
+        BNO055IMU.Parameters IMU_Parameters;
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        IMU_Parameters = new BNO055IMU.Parameters();
+        IMU_Parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imu.initialize(IMU_Parameters);
+    }
     public boolean wheelCheck(){
         return (wheel1 != null && wheel2 != null && wheel3 != null && wheel4 != null);
     }
@@ -205,7 +212,7 @@ public class George
     public void flick(boolean a){
         if (a) {
             ElapsedTime wait = new ElapsedTime();
-            while(wait.time(TimeUnit.SECONDS) < 1.5) {
+            while(wait.time(TimeUnit.SECONDS) < 0.5) {
                 Flick.setPosition(0);
             }
             Flick.setPosition(1);

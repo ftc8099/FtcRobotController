@@ -45,7 +45,9 @@ public class Drive2021_2 extends LinearOpMode {
 //                if (gamepad1.left_bumper){
 //                    george.shoot(3);
 //                }
-
+                if (gamepad1.y){
+                    george.initGyro(hardwareMap);
+                }
                 telemetry.update();
             }
         }

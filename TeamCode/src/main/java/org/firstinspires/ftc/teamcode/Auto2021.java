@@ -67,6 +67,7 @@ public class Auto2021 extends LinearOpMode {
             george.intake(10);
             george.shoot(5);
             george.drive(0,1,1);
+
             telemetry.update();
         }
 
