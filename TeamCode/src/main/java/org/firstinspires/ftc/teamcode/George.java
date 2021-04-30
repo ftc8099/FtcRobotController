@@ -57,8 +57,10 @@ public class George
     public Servo Flick;
     private DcMotor BaseArm;
     private Servo arm;
+    public Debounce rampIn;
+    public Debounce rampOut;
     float gyro;
-    double speed = 1;
+    double speed = 0.5;
     double stickAngle;
     double rotateSpeed = 0.5;
     double FlickPosition;
@@ -97,6 +99,8 @@ public class George
         FlickPosition = Flick.getPosition();
         IMU_Parameters = new BNO055IMU.Parameters();
         IMU_Parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        rampIn = new Debounce(5);
+        rampOut = new Debounce(5);
         imu.initialize(IMU_Parameters);
         Flick.setPosition(1);
     }
@@ -108,6 +112,7 @@ public class George
         IMU_Parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(IMU_Parameters);
     }
+
     public boolean wheelCheck(){
         return (wheel1 != null && wheel2 != null && wheel3 != null && wheel4 != null);
     }
@@ -116,14 +121,62 @@ public class George
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
     }
 
+    public void driveAndRotate(double x, double y, double rotate){
+
+        double w1 = 0;
+        double w2 = 0;
+        double w3 = 0;
+        double w4 = 0;
+
+        gyro = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+        // idea: ability to change speed during play?
+        x = -x;
+        double eqX;
+        double eqY;
+        // if the gamepad left stick is moved:
+        if (x != 0 || y != 0) {
+            // calculate angle of the stick from x & y values
+            stickAngle = Math.atan2(y, x) / Math.PI * 180;
+            // remove the gyro angle & translate to x & y
+            eqX = Math.cos((stickAngle + gyro) / 180 * Math.PI);
+            eqY = Math.sin((stickAngle + gyro) / 180 * Math.PI);
+            // Set powers of wheels to move in intended direction
+            w1 += ((eqY + eqX) * speed);
+            w3 += ((eqY + eqX) * speed);
+            w2 += ((eqY - eqX) * speed);
+            w4 += ((eqY - eqX) * speed);
+        }
+
+
+        // if the gamepad right stick is moved:
+        if (rotate < 0) {
+            // if it's to the right, rotate clockwise
+            rotateSpeed = Math.abs(rotate);
+            w1 += (rotateSpeed);
+            w4 += (rotateSpeed);
+            w2 += (-rotateSpeed);
+            w3 +=(-rotateSpeed);
+        } else if (rotate > 0) {
+            // if it's to the left, rotate counter-clockwise
+            rotateSpeed = Math.abs(rotate);
+            w1 += (-rotateSpeed);
+            w4 += (-rotateSpeed);
+            w2 += (rotateSpeed);
+            w3 +=(rotateSpeed);
+        }
+        wheel1.setPower(w1);
+        wheel2.setPower(w2);
+        wheel3.setPower(w3);
+        wheel4.setPower(w4);
+    }
+
     public void drive(double x, double y) {
         // Idea: ability to 'reset' the starting angle of the robot during play?
         // sets bot to angle from starting position
         gyro = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
         // idea: ability to change speed during play?
-
+        speed = Math.sqrt(x * x + y * y);
         x = -x;
-        //y = -y;
         double eqX;
         double eqY;
         // if the gamepad left stick is moved:
@@ -139,12 +192,12 @@ public class George
             wheel2.setPower((eqY - eqX) * speed);
             wheel4.setPower((eqY - eqX) * speed);
         }
-
         wheel1.setPower(0);
         wheel3.setPower(0);
         wheel2.setPower(0);
         wheel4.setPower(0);
     }
+
 
     public void drive(double x, double y, double time) {
          ElapsedTime timer  = new ElapsedTime();
@@ -162,12 +215,14 @@ public class George
         // if the gamepad right stick is moved:
         if (x < 0) {
             // if it's to the right, rotate clockwise
+            rotateSpeed = Math.abs(x);
             wheel1.setPower(rotateSpeed);
             wheel4.setPower(rotateSpeed);
             wheel2.setPower(-rotateSpeed);
             wheel3.setPower(-rotateSpeed);
         } else if (x > 0) {
             // if it's to the left, rotate counter-clockwise
+            rotateSpeed = Math.abs(x);
             wheel1.setPower(-rotateSpeed);
             wheel4.setPower(-rotateSpeed);
             wheel2.setPower(rotateSpeed);
@@ -175,20 +230,40 @@ public class George
         }
     }
 
-    public void intake(boolean ramp) {
-        Ramp.setPower(0);
-        if (ramp) {
+    boolean inPower = false;
+    boolean outPower = false;
+
+    public void intake(boolean in, boolean out) {
+        if (rampIn.press(in)) {
+            inPower = !inPower;
+            if (inPower){
+                outPower = false;
+            }
+        }
+        if (rampOut.press(out)) {
+            outPower = !outPower;
+            if (outPower){
+                inPower = false;
+            }
+        }
+        if (inPower){
             Ramp.setPower(1);
+        }else if (outPower){
+            Ramp.setPower(-1);
+        }else{
+            Ramp.setPower(0);
         }
     }
+
     public void intake(double time){
         ElapsedTime rampTime = new ElapsedTime();
         rampTime.reset();
-        if(rampTime.time(TimeUnit.SECONDS) < time){
-            intake(true);
+        while(rampTime.time(TimeUnit.SECONDS) < time){
+            intake(true, false);
         }
-        intake(false);
+        intake(false, true);
     }
+
     public void shoot(boolean a, boolean b, boolean x) {
 
         if (a) {
@@ -203,18 +278,21 @@ public class George
         if (x) {
             ElapsedTime timer = new ElapsedTime();
             timer.reset();
-            Flick.setPosition(0);
-            if (timer.time(TimeUnit.SECONDS) > 1){
-                Flick.setPosition(1);
+            while (timer.time(TimeUnit.SECONDS) < 1) {
+                Flick.setPosition(0);
             }
+            Flick.setPosition(1);
         }
     }
+
     public void flick(boolean a){
         if (a) {
             ElapsedTime wait = new ElapsedTime();
-            while(wait.time(TimeUnit.SECONDS) < 0.5) {
+            while(wait.time(TimeUnit.SECONDS) < 0.25) {
                 Flick.setPosition(0);
             }
+            Flick.setPosition(1);
+        }else {
             Flick.setPosition(1);
         }
     }
@@ -230,11 +308,10 @@ public class George
                 shoot(true, false, true);
             }
         }
-        shoot(false, true, false);
-
+        //shoot(false, true, false);
     }
 
-    public void arm (boolean baseUp, boolean baseDown, boolean gripper){
+    public void arm (boolean baseUp, boolean baseDown, boolean openGrip, boolean closeGrip){
         BaseArm.setPower(0);
         //  may need to reverse the BaseArm direction in the George constructor
         if (baseUp){
@@ -243,9 +320,10 @@ public class George
         if (baseDown){
             BaseArm.setPower(-0.50);
         }
-        if (gripper){
-            armPosition = Math.abs(armPosition - 1); //sets the armPosition to 1 or 0, whichever it is not
-            arm.setPosition(armPosition);
+        if (openGrip){
+            arm.setPosition(0);
+        } else if (closeGrip){
+            arm.setPosition(1);
         }
     }
 
@@ -257,16 +335,12 @@ public class George
         //possible error: will below line stop arm movement prematurely?
         BaseArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
     public void gripper(boolean open){
         if (open) {
             arm.setPosition(1);
         }else{
             arm.setPosition(0);
         }
-
     }
-
-
-
  }
-
